@@ -4,6 +4,7 @@ import { Roboto } from 'next/font/google';
 import "./globals.css";
 import theme from '../theme';
 import { ThemeProvider } from '@mui/material/styles';
+import StoreProvider from './StoreProvider';
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -26,9 +27,11 @@ export default function RootLayout({
     <html lang="en" className={roboto.variable}>
       <body>
         <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-            {children}
-          </ThemeProvider>
+          <StoreProvider>
+            <ThemeProvider theme={theme}>
+              {children}
+            </ThemeProvider>
+          </StoreProvider>
         </AppRouterCacheProvider>
       </body>
     </html>
