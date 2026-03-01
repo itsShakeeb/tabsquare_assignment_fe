@@ -7,10 +7,10 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { FoodItem, CartItem } from '../../auth/user/types';
+import { FoodItem, CartItem, Item } from '../../auth/user/types';
 import { useAppDispatch } from '../../../lib/hooks';
 import { addToCart } from '../../../lib/features/cart/cartSlice';
-import { useGetAddonsQuery } from '../../../lib/api';
+import { useAddToCartMutation, useGetAddonsQuery } from '../../../lib/api';
 import { Addon } from '../../../lib/features/item/type';
 
 interface Props {
@@ -24,6 +24,7 @@ export default function ItemDetailsModal({ open, food, onClose }: Props) {
 
     const [selectedAddons, setSelectedAddons] = useState<Addon[]>([]);
     const { data: addons = [] } = useGetAddonsQuery();
+    const [addToCart, { isLoading, isSuccess, isError }] = useAddToCartMutation();
     const [specialInstructions, setSpecialInstructions] = useState('');
     const [quantity, setQuantity] = useState(1);
 
@@ -49,24 +50,28 @@ export default function ItemDetailsModal({ open, food, onClose }: Props) {
     const basePrice = (Number(food.base_price)) + addonsTotal;
     const itemTotal = basePrice * quantity;
 
-    const handleAddToCart = () => {
-        const cartItem: CartItem = {
-            id: `${food.id}-${selectedAddons.map(a => a.id).sort().join('-')}-${specialInstructions}`,
-            foodItemId: food.id,
+    const handleAddToCart = async () => {
+        const cartItem: Item = {
+            id: `${food.id}`,
+            item_id: food.id,
             name: food.name,
-            basePrice: basePrice,
-            totalPrice: itemTotal,
+            base_price: basePrice,
+            total_price: itemTotal,
             quantity: quantity,
-            imageUrl: food.image,
+            image: food.image,
             options: {
                 addons: selectedAddons.map(a => ({ id: a.id, name: a.name, price: Number(a.price) })),
-                specialInstructions: specialInstructions || undefined,
+                instructions: specialInstructions || undefined,
             }
         };
-
-        dispatch(addToCart(cartItem));
-        onClose();
+        try {
+            await addToCart(cartItem).unwrap();
+            onClose();
+        } catch (error) {
+            console.error('Failed to add item to cart:', error);
+        }
     };
+
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 3 } }}>
@@ -144,6 +149,7 @@ export default function ItemDetailsModal({ open, food, onClose }: Props) {
                 <Button
                     variant="contained"
                     onClick={handleAddToCart}
+                    disabled={isLoading}
                     sx={{
                         bgcolor: '#f26a1b',
                         color: '#fff',

@@ -2,6 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { SigninRequest, SigninResponse } from './features/auth/type'
 import { Category, ItemResposne, Dietary, Addon } from './features/item/type'
 import { buildQueryParams } from './utils'
+import { CartItem, Item } from '@/app/auth/user/types'
 
 export const api = createApi({
     baseQuery: fetchBaseQuery({
@@ -40,7 +41,33 @@ export const api = createApi({
             query: () => ({ url: `/add_ons`, method: 'GET' }),
             providesTags: ['Addon'],
         }),
+        addToCart: build.mutation<void, Item>({
+            query: (body) => ({ url: `/cart/items`, method: 'POST', body }),
+            invalidatesTags: ['Item'],
+        }),
+        getCartItems: build.query<CartItem, void>({
+            query: () => ({ url: `/cart`, method: 'GET' }),
+            providesTags: ['Item'],
+        }),
+        deleteCartItem: build.mutation<void, string>({
+            query: (id) => ({ url: `/cart/items/${id}`, method: 'DELETE' }),
+            invalidatesTags: ['Item'],
+        }),
+        checkout: build.mutation<void, void>({
+            query: () => ({ url: `/order/checkout`, method: 'POST' }),
+            invalidatesTags: ['Item'],
+        }),
     }),
 })
 
-export const { useSigninMutation, useGetItemsQuery, useGetCategoriesQuery, useGetDietaryQuery, useGetAddonsQuery } = api
+export const {
+    useSigninMutation,
+    useGetItemsQuery,
+    useGetCategoriesQuery,
+    useGetDietaryQuery,
+    useGetAddonsQuery,
+    useAddToCartMutation,
+    useGetCartItemsQuery,
+    useDeleteCartItemMutation,
+    useCheckoutMutation
+} = api

@@ -27,16 +27,29 @@ export interface FoodItem extends ItemResposne {
 export interface CartItemOption {
     size?: ItemSize;
     addons: FoodAddon[];
-    specialInstructions?: string;
+    instructions?: string;
+}
+
+export interface Item {
+
+    id: string;
+    item_id: string;
+    name: string;
+    base_price: number;
+    total_price: number;
+    quantity: number;
+    image: string;
+    options: CartItemOption;
+
 }
 
 export interface CartItem {
-    id: string; // unique ID for cart entry (since same food item can be added with different options)
-    foodItemId: string;
-    name: string;
-    basePrice: number;
-    totalPrice: number;
-    quantity: number;
-    imageUrl: string;
-    options: CartItemOption;
+    cart_id: string
+    items: Item[],
+    summary: {
+        subtotal: number;
+        delivery_fee: number;
+        total: number;
+        tax: number;
+    }
 }

@@ -1,28 +1,50 @@
 'use client';
-import React from 'react';
-import { Box, Typography, Button, IconButton, Divider, Select, MenuItem, Chip } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Typography, Button, IconButton, Divider, Select, MenuItem, Chip, CircularProgress } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { useAppSelector, useAppDispatch } from '../../../lib/hooks';
-import { updateQuantity, removeFromCart } from '../../../lib/features/cart/cartSlice';
+import { useAppDispatch } from '../../../lib/hooks';
+import { removeFromCart } from '../../../lib/features/cart/cartSlice';
+import { useGetCartItemsQuery, useDeleteCartItemMutation, useCheckoutMutation } from '../../../lib/api';
+import { useRouter } from 'next/navigation';
 
 export default function CartSidebar() {
     const dispatch = useAppDispatch();
-    const items = useAppSelector(state => state.cart.items);
+    const router = useRouter();
+    const [deleteCartItem] = useDeleteCartItemMutation();
+    const [checkout] = useCheckoutMutation();
+    const { data: cartItems = { items: [], summary: { subtotal: 0, delivery_fee: 0, total: 0, tax: 0 } } } = useGetCartItemsQuery();
 
-    const handleQuantityChange = (id: string, newQuantity: number) => {
-        dispatch(updateQuantity({ id, quantity: newQuantity }));
+    const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+
+    const handleRemoveItem = async (id: string) => {
+        try {
+            await deleteCartItem(id).unwrap();
+            dispatch(removeFromCart(id));
+        } catch (error) {
+            console.error('Failed to remove item from cart:', error);
+        }
     };
 
-    const handleRemoveItem = (id: string) => {
-        dispatch(removeFromCart(id));
-    };
+    const subTotal = Number(cartItems?.summary?.subtotal) || 0;
+    const tax = Number(cartItems?.summary?.tax) || 0;
+    const total = Number(cartItems?.summary?.total) || 0;
 
-    const subTotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
-    const deliveryFee = items.length > 0 ? 9 : 0;
-    const total = subTotal + deliveryFee;
+    const handleCheckout = async () => {
+        try {
+            setIsCheckingOut(true);
+            await checkout().unwrap();
+
+            setTimeout(() => {
+                router.push('/order-placed');
+            }, 1000);
+        } catch (error) {
+            setIsCheckingOut(false);
+        }
+    }
 
     return (
         <Box sx={{ width: 350, bgcolor: '#fff', borderRadius: 4, p: 3, boxShadow: '0 4px 24px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -30,7 +52,6 @@ export default function CartSidebar() {
                 My Orders
             </Typography>
 
-            {/* Delivery Info */}
             <Box sx={{ mb: 3 }}>
                 <Typography variant="body2" color="text.secondary" fontWeight={600} sx={{ mb: 0.5 }}>
                     Delivery address
@@ -53,18 +74,17 @@ export default function CartSidebar() {
 
             <Divider sx={{ mb: 3 }} />
 
-            {/* Cart Items */}
             <Box sx={{ flexGrow: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {items.length === 0 ? (
+                {cartItems.items.length === 0 ? (
                     <Box sx={{ textAlign: 'center', color: 'text.secondary', mt: 4 }}>
                         <Typography variant="body1">Your cart is empty.</Typography>
                     </Box>
                 ) : (
-                    items.map((item) => (
+                    cartItems.items.map((item) => (
                         <Box key={item.id} sx={{ display: 'flex', gap: 2 }}>
                             <Box
                                 component="img"
-                                src={item.imageUrl}
+                                src={item.image}
                                 sx={{ width: 64, height: 64, borderRadius: 3, objectFit: 'cover' }}
                             />
                             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
@@ -73,60 +93,33 @@ export default function CartSidebar() {
                                         {item.name}
                                     </Typography>
                                     <Typography variant="subtitle2" fontWeight={800} color="primary.main">
-                                        ${item.totalPrice.toFixed(2)}
+                                        ${Number(item.base_price).toFixed(2)}
                                     </Typography>
                                 </Box>
 
-                                {/* Customizations */}
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                    {item.options.size && (
-                                        <Chip label={item.options.size} size="small" sx={{ height: 18, fontSize: '0.65rem' }} />
-                                    )}
-                                    {item.options.addons.map(addon => (
-                                        <Chip key={addon.id} label={'+ ' + addon.name} size="small" sx={{ height: 18, fontSize: '0.65rem', bgcolor: '#f5f5f5' }} />
-                                    ))}
-                                </Box>
-                                {item.options.specialInstructions && (
+                                {item.options?.instructions && (
                                     <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.7rem' }}>
-                                        Wait: "{item.options.specialInstructions}"
+                                        Wait: "{item.options.instructions}"
                                     </Typography>
                                 )}
 
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5, justifyContent: 'space-between' }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>Qty:</Typography>
-                                        <Select
-                                            value={item.quantity}
-                                            onChange={(e) => handleQuantityChange(item.id, Number(e.target.value))}
-                                            size="small"
-                                            sx={{
-                                                width: 65, height: 30, borderRadius: 2, bgcolor: '#fafafa',
-                                                fontSize: '0.875rem', fontWeight: 600,
-                                                '& fieldset': { border: 'none' },
-                                            }}
-                                        >
-                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => <MenuItem key={n} value={n} sx={{ fontSize: '0.875rem' }}>{n}</MenuItem>)}
-                                        </Select>
-                                    </Box>
-                                    <IconButton size="small" color="error" onClick={() => handleRemoveItem(item.id)}>
-                                        <DeleteOutlineIcon fontSize="small" />
-                                    </IconButton>
-                                </Box>
+                                <IconButton size="small" color="error" onClick={() => handleRemoveItem(item.item_id)} sx={{ alignSelf: 'flex-end' }}>
+                                    <DeleteOutlineIcon fontSize="small" />
+                                </IconButton>
                             </Box>
                         </Box>
                     ))
                 )}
             </Box>
 
-            {/* Pricing Details */}
             <Box sx={{ mt: 4 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                     <Typography variant="body2" color="text.secondary">Sub Total</Typography>
                     <Typography variant="subtitle2" fontWeight={700}>${subTotal.toFixed(2)}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                    <Typography variant="body2" color="text.secondary">Delivery Fee</Typography>
-                    <Typography variant="subtitle2" fontWeight={700}>${deliveryFee.toFixed(2)}</Typography>
+                    <Typography variant="body2" color="text.secondary">Tax</Typography>
+                    <Typography variant="subtitle2" fontWeight={700}>${tax.toFixed(2)}</Typography>
                 </Box>
 
 
@@ -139,14 +132,15 @@ export default function CartSidebar() {
                 <Button
                     variant="contained"
                     fullWidth
-                    disabled={items.length === 0}
+                    onClick={handleCheckout}
+                    disabled={cartItems.items.length === 0 || isCheckingOut}
                     sx={{
                         bgcolor: '#f26a1b', color: '#fff', textTransform: 'none', fontWeight: 700, fontSize: '1rem', borderRadius: 3, py: 2, boxShadow: 'none',
                         '&:hover': { bgcolor: '#d95d16', boxShadow: 'none' },
                         '&.Mui-disabled': { bgcolor: '#ffccb3', color: '#fff' }
                     }}
                 >
-                    Check out
+                    {isCheckingOut ? <CircularProgress size={24} color="inherit" /> : 'Check out'}
                 </Button>
             </Box>
         </Box>

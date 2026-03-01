@@ -5,6 +5,9 @@ export const getItemsMock = vi.fn()
 export const getCategoriesMock = vi.fn()
 export const getDietaryMock = vi.fn()
 export const getAddonsMock = vi.fn()
+export const getCartItemsMock = vi.fn()
+export const deleteCartItemMock = vi.fn()
+export const checkoutMock = vi.fn()
 
 export const mockApi = () => {
     vi.mock('@/lib/api', async () => {
@@ -19,6 +22,15 @@ export const mockApi = () => {
             useGetCategoriesQuery: getCategoriesMock,
             useGetDietaryQuery: getDietaryMock,
             useGetAddonsQuery: getAddonsMock,
+            useGetCartItemsQuery: getCartItemsMock,
+            useDeleteCartItemMutation: () => [
+                deleteCartItemMock,
+                { isLoading: false, reset: vi.fn() },
+            ],
+            useCheckoutMutation: () => [
+                checkoutMock,
+                { isLoading: false, reset: vi.fn() },
+            ],
         }
     })
 }
