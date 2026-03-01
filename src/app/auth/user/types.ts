@@ -53,3 +53,32 @@ export interface CartItem {
         tax: number;
     }
 }
+
+export interface UserOrderItem {
+    order_item_id: string;
+    quantity: number;
+    size: string | null;
+    instruction: string | null;
+    price_at_purchase: string;
+    item_id: string;
+    item_name: string;
+    image: string;
+    add_ons: any[]; // replace with actual generic addon type if needed
+}
+
+export interface UserOrder {
+    id: string;
+    customer_id: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+    customer_name: string;
+    email: string;
+    phone_no: string;
+    items: UserOrderItem[];
+    summary: {
+        subtotal: number;
+        tax: number;
+        total: number;
+    };
+}

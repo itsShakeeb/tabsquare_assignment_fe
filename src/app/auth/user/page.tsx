@@ -4,6 +4,7 @@ import { Box, CircularProgress, Grid, Typography } from '@mui/material';
 import FoodSearchHeader from '../../components/user/FoodSearchHeader';
 import CategoryTabs from '../../components/user/CategoryTabs';
 import FoodCard from '../../components/user/FoodCard';
+import MyLatestOrder from '../../components/user/MyLatestOrder';
 import ItemDetailsModal from '../../components/user/ItemDetailsModal';
 import { FoodItem } from './types';
 import { useGetItemsQuery } from '@/lib/api';
@@ -25,6 +26,8 @@ export default function UserFoodOrderPage() {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <MyLatestOrder />
+
             <FoodSearchHeader
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}

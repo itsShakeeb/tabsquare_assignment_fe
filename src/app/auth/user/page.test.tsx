@@ -2,7 +2,7 @@ import { describe, expect, test, beforeEach, beforeAll, afterAll, vi } from 'vit
 import { screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { renderWithStore } from '@/tests/utils/renderWithStore'
 import { mockNextRouter } from '@/tests/mocks/router'
-import { mockApi, getItemsMock, getCategoriesMock, getDietaryMock, getAddonsMock } from '@/tests/mocks/api'
+import { mockApi, getItemsMock, getCategoriesMock, getDietaryMock, getAddonsMock, getMyOrdersMock } from '@/tests/mocks/api'
 import UserFoodOrderPage from './page'
 
 mockNextRouter()
@@ -47,6 +47,7 @@ describe('UserFoodOrderPage', () => {
         getDietaryMock.mockReturnValue({ data: mockDietary, isLoading: false })
         getAddonsMock.mockReturnValue({ data: [], isLoading: false })
         getItemsMock.mockReturnValue({ data: [], isLoading: false })
+        getMyOrdersMock.mockReturnValue({ data: [], isLoading: false })
     })
 
     test('should render without exploding', () => {

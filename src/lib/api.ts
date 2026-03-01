@@ -2,7 +2,8 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { SigninRequest, SigninResponse } from './features/auth/type'
 import { Category, ItemResposne, Dietary, Addon } from './features/item/type'
 import { buildQueryParams } from './utils'
-import { CartItem, Item } from '@/app/auth/user/types'
+import { CartItem, Item, UserOrder } from '@/app/auth/user/types'
+import { OrderDetail } from '@/app/auth/admin/order/type'
 
 export const api = createApi({
     baseQuery: fetchBaseQuery({
@@ -57,6 +58,10 @@ export const api = createApi({
             query: () => ({ url: `/order/checkout`, method: 'POST' }),
             invalidatesTags: ['Item'],
         }),
+        getMyOrders: build.query<UserOrder[], void>({
+            query: () => ({ url: `/order/my-orders`, method: 'GET' }),
+            providesTags: ['Item'], // or creating a new tag 'Order'
+        }),
     }),
 })
 
@@ -69,5 +74,6 @@ export const {
     useAddToCartMutation,
     useGetCartItemsQuery,
     useDeleteCartItemMutation,
-    useCheckoutMutation
+    useCheckoutMutation,
+    useGetMyOrdersQuery
 } = api

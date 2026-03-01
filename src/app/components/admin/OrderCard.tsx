@@ -57,30 +57,34 @@ export default function OrderCard({ order, onStatusChange }: OrderCardProps) {
                             <Typography variant="body2">{order.orderTime}</Typography>
                         </Box>
                     </Box>
-                    <Box sx={{ minWidth: 160 }}>
-                        <FormControl fullWidth size="small">
-                            <InputLabel id={`status-label-${order.id}`}>Status</InputLabel>
-                            <Select
-                                labelId={`status-label-${order.id}`}
-                                value={order.status}
-                                label="Status"
-                                onChange={handleStatusChange}
-                                sx={{
-                                    bgcolor: 'background.paper',
-                                    fontWeight: 500,
-                                    '& .MuiSelect-select': {
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        py: 1,
-                                    }
-                                }}
-                            >
-                                <MenuItem value="Received"><StatusLabel status="Received" /></MenuItem>
-                                <MenuItem value="Preparing"><StatusLabel status="Preparing" /></MenuItem>
-                                <MenuItem value="Ready"><StatusLabel status="Ready" /></MenuItem>
-                                <MenuItem value="Completed"><StatusLabel status="Completed" /></MenuItem>
-                            </Select>
-                        </FormControl>
+                    <Box sx={{ minWidth: 160, display: 'flex', justifyContent: 'flex-end' }}>
+                        {onStatusChange ? (
+                            <FormControl fullWidth size="small">
+                                <InputLabel id={`status-label-${order.id}`}>Status</InputLabel>
+                                <Select
+                                    labelId={`status-label-${order.id}`}
+                                    value={order.status}
+                                    label="Status"
+                                    onChange={handleStatusChange}
+                                    sx={{
+                                        bgcolor: 'background.paper',
+                                        fontWeight: 500,
+                                        '& .MuiSelect-select': {
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            py: 1,
+                                        }
+                                    }}
+                                >
+                                    <MenuItem value="Received"><StatusLabel status="Received" /></MenuItem>
+                                    <MenuItem value="Preparing"><StatusLabel status="Preparing" /></MenuItem>
+                                    <MenuItem value="Ready"><StatusLabel status="Ready" /></MenuItem>
+                                    <MenuItem value="Completed"><StatusLabel status="Completed" /></MenuItem>
+                                </Select>
+                            </FormControl>
+                        ) : (
+                            <StatusLabel status={order.status} />
+                        )}
                     </Box>
                 </Box>
 

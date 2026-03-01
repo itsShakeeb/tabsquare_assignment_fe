@@ -8,6 +8,7 @@ export const getAddonsMock = vi.fn()
 export const getCartItemsMock = vi.fn()
 export const deleteCartItemMock = vi.fn()
 export const checkoutMock = vi.fn()
+export const getMyOrdersMock = vi.fn()
 
 export const mockApi = () => {
     vi.mock('@/lib/api', async () => {
@@ -31,6 +32,7 @@ export const mockApi = () => {
                 checkoutMock,
                 { isLoading: false, reset: vi.fn() },
             ],
+            useGetMyOrdersQuery: getMyOrdersMock,
         }
     })
 }
