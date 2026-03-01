@@ -21,26 +21,26 @@ export default function FoodCard({ item, onClick }: Props) {
                 boxShadow: 'none',
                 position: 'relative',
                 bgcolor: 'transparent',
-                cursor: item.isAvailable ? 'pointer' : 'default',
-                opacity: item.isAvailable ? 1 : 0.6,
+                cursor: item.is_available ? 'pointer' : 'default',
+                opacity: item.is_available ? 1 : 0.6,
                 transition: 'transform 0.2s',
                 '&:hover': {
-                    transform: item.isAvailable ? 'translateY(-4px)' : 'none',
+                    transform: item.is_available ? 'translateY(-4px)' : 'none',
                 }
             }}
-            onClick={() => { if (item.isAvailable) onClick(item); }}
+            onClick={() => { if (item.is_available) onClick(item); }}
         >
             <Box sx={{ position: 'relative' }}>
                 <CardMedia
                     component="img"
                     height="160"
-                    image={item.imageUrl}
+                    image={item.image}
                     alt={item.name}
                     sx={{ borderRadius: 4, objectFit: 'cover' }}
                 />
 
                 {/* Dietary Tags */}
-                <Box sx={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: '80%' }}>
+                {/* <Box sx={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: '80%' }}>
                     {item.dietaryPreferences.map(pref => (
                         <Chip
                             key={pref}
@@ -55,10 +55,10 @@ export default function FoodCard({ item, onClick }: Props) {
                             }}
                         />
                     ))}
-                </Box>
+                </Box> */}
 
                 {/* Availability Overlay */}
-                {!item.isAvailable && (
+                {!item.is_available && (
                     <Box sx={{
                         position: 'absolute',
                         top: 0, left: 0, right: 0, bottom: 0,
@@ -105,11 +105,11 @@ export default function FoodCard({ item, onClick }: Props) {
                         </Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary', fontSize: '0.75rem', fontWeight: 500 }}>
                             <AccessTimeIcon sx={{ fontSize: '1rem', mr: 0.5 }} />
-                            {item.preparationTime} mins
+                            {item.preparation_time} mins
                         </Box>
                     </Box>
                     <Typography variant="subtitle1" fontWeight={800} sx={{ color: '#111827' }}>
-                        ${item.price.toFixed(2)}
+                        ${Number(item.base_price).toFixed(2)}
                     </Typography>
                 </Box>
             </CardContent>

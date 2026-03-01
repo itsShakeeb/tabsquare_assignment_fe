@@ -1,5 +1,7 @@
+import { ItemResposne } from "@/lib/features/item/type";
+
 export type Category = 'All' | 'Appetizers' | 'Main Course' | 'Desserts' | 'Beverages';
-export type DietaryPreference = 'Vegetarian' | 'Vegan' | 'Gluten-Free';
+export type DietaryPreference = string;
 export type ItemSize = 'Regular' | 'Large' | 'Extra Large';
 
 export interface FoodAddon {
@@ -8,18 +10,18 @@ export interface FoodAddon {
     price: number;
 }
 
-export interface FoodItem {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    imageUrl: string;
-    category: Category;
-    dietaryPreferences: DietaryPreference[];
-    preparationTime: number; // in minutes
-    isAvailable: boolean;
-    availableSizes?: ItemSize[];
-    availableAddons?: FoodAddon[];
+export interface FoodItem extends ItemResposne {
+    // id: string;
+    // name: string;
+    // description: string;
+    // price: number;
+    // image: string;
+    // category: Category;
+    // dietary_preferences: DietaryPreference[];
+    // preparation_time: number; // in minutes
+    // is_available: boolean;
+    // available_sizes?: ItemSize[];
+    // available_addons?: FoodAddon[];
 }
 
 export interface CartItemOption {

@@ -4,12 +4,13 @@ import cartReducer from './features/cart/cartSlice'
 import authReducer from './features/auth/authSlice'
 import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-
+import itemReducer from './features/item/itemSlice'
 
 const reducers = {
     [api.reducerPath]: api.reducer,
     cart: cartReducer,
-    auth: authReducer
+    auth: authReducer,
+    items: itemReducer
 }
 
 const rootReducer = combineReducers(reducers);

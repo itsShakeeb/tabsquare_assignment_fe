@@ -7,6 +7,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { DietaryPreference } from '../../auth/user/types';
+import { useGetDietaryQuery } from '@/lib/api';
 
 interface Props {
     searchQuery: string;
@@ -21,6 +22,7 @@ export default function FoodSearchHeader({
     searchQuery, onSearchChange, priceRange, onPriceRangeChange, dietaryPrefs, onDietaryPrefsChange
 }: Props) {
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+    const { data: dietaryOptions = [] } = useGetDietaryQuery();
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
@@ -109,20 +111,20 @@ export default function FoodSearchHeader({
                     Dietary Preferences
                 </Typography>
                 <FormGroup>
-                    {(['Vegetarian', 'Vegan', 'Gluten-Free'] as DietaryPreference[]).map((pref) => (
+                    {dietaryOptions.map((pref) => (
                         <FormControlLabel
-                            key={pref}
+                            key={pref.id}
                             control={
                                 <Checkbox
-                                    checked={dietaryPrefs.includes(pref)}
-                                    onChange={() => handleDietaryChange(pref)}
+                                    checked={dietaryPrefs.includes(pref.id)}
+                                    onChange={() => handleDietaryChange(pref.id)}
                                     sx={{
                                         color: '#bdbdbd',
                                         '&.Mui-checked': { color: '#f26a1b' }
                                     }}
                                 />
                             }
-                            label={<Typography variant="body2">{pref}</Typography>}
+                            label={<Typography variant="body2">{pref.name}</Typography>}
                         />
                     ))}
                 </FormGroup>

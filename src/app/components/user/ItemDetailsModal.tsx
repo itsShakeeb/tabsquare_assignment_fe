@@ -2,15 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
-    Button, Typography, Box, IconButton, Divider,
-    RadioGroup, Radio, FormControlLabel, Checkbox, TextField
+    Button, Typography, Box, IconButton, Divider, FormControlLabel, Checkbox, TextField
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { FoodItem, ItemSize, FoodAddon, CartItem } from '../../auth/user/types';
+import { FoodItem, CartItem } from '../../auth/user/types';
 import { useAppDispatch } from '../../../lib/hooks';
 import { addToCart } from '../../../lib/features/cart/cartSlice';
+import { useGetAddonsQuery } from '../../../lib/api';
+import { Addon } from '../../../lib/features/item/type';
 
 interface Props {
     open: boolean;
@@ -21,14 +22,13 @@ interface Props {
 export default function ItemDetailsModal({ open, food, onClose }: Props) {
     const dispatch = useAppDispatch();
 
-    const [selectedSize, setSelectedSize] = useState<ItemSize | undefined>();
-    const [selectedAddons, setSelectedAddons] = useState<FoodAddon[]>([]);
+    const [selectedAddons, setSelectedAddons] = useState<Addon[]>([]);
+    const { data: addons = [] } = useGetAddonsQuery();
     const [specialInstructions, setSpecialInstructions] = useState('');
     const [quantity, setQuantity] = useState(1);
 
     useEffect(() => {
         if (open && food) {
-            setSelectedSize(food.availableSizes ? food.availableSizes[0] : undefined);
             setSelectedAddons([]);
             setSpecialInstructions('');
             setQuantity(1);
@@ -37,7 +37,7 @@ export default function ItemDetailsModal({ open, food, onClose }: Props) {
 
     if (!food) return null;
 
-    const handleAddonChange = (addon: FoodAddon) => {
+    const handleAddonChange = (addon: Addon) => {
         if (selectedAddons.find(a => a.id === addon.id)) {
             setSelectedAddons(selectedAddons.filter(a => a.id !== addon.id));
         } else {
@@ -45,24 +45,21 @@ export default function ItemDetailsModal({ open, food, onClose }: Props) {
         }
     };
 
-    const addonsTotal = selectedAddons.reduce((sum, addon) => sum + addon.price, 0);
-    // Rough size pricing logic for demo purposes:
-    const sizeMultiplier = selectedSize === 'Large' ? 1.25 : selectedSize === 'Extra Large' ? 1.5 : 1;
-    const basePrice = (food.price * sizeMultiplier) + addonsTotal;
+    const addonsTotal = selectedAddons.reduce((sum, addon) => sum + Number(addon.price), 0);
+    const basePrice = (Number(food.base_price)) + addonsTotal;
     const itemTotal = basePrice * quantity;
 
     const handleAddToCart = () => {
         const cartItem: CartItem = {
-            id: `${food.id}-${selectedSize || 'default'}-${selectedAddons.map(a => a.id).sort().join('-')}-${specialInstructions}`,
+            id: `${food.id}-${selectedAddons.map(a => a.id).sort().join('-')}-${specialInstructions}`,
             foodItemId: food.id,
             name: food.name,
             basePrice: basePrice,
             totalPrice: itemTotal,
             quantity: quantity,
-            imageUrl: food.imageUrl,
+            imageUrl: food.image,
             options: {
-                size: selectedSize,
-                addons: selectedAddons,
+                addons: selectedAddons.map(a => ({ id: a.id, name: a.name, price: Number(a.price) })),
                 specialInstructions: specialInstructions || undefined,
             }
         };
@@ -80,44 +77,23 @@ export default function ItemDetailsModal({ open, food, onClose }: Props) {
             <Divider />
 
             <DialogContent dividers sx={{ p: 0 }}>
-                {/* Header Info */}
+
                 <Box sx={{ p: 3, display: 'flex', gap: 2 }}>
-                    <Box component="img" src={food.imageUrl} sx={{ width: 100, height: 100, borderRadius: 2, objectFit: 'cover' }} />
+                    <Box component="img" src={food.image} sx={{ width: 100, height: 100, borderRadius: 2, objectFit: 'cover' }} />
                     <Box>
                         <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1.2, mb: 0.5 }}>{food.name}</Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{food.description}</Typography>
-                        <Typography variant="subtitle1" fontWeight={700} color="primary.main">${food.price.toFixed(2)} Base</Typography>
+                        <Typography variant="subtitle1" fontWeight={700} color="primary.main">${Number(food.base_price).toFixed(2)} Base</Typography>
                     </Box>
                 </Box>
                 <Divider />
 
-                {/* Size Selection */}
-                {food.availableSizes && food.availableSizes.length > 0 && (
-                    <Box sx={{ p: 3 }}>
-                        <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>Choose Size</Typography>
-                        <RadioGroup
-                            value={selectedSize}
-                            onChange={(e) => setSelectedSize(e.target.value as ItemSize)}
-                        >
-                            {food.availableSizes.map(size => (
-                                <FormControlLabel
-                                    key={size}
-                                    value={size}
-                                    control={<Radio sx={{ color: '#f26a1b', '&.Mui-checked': { color: '#f26a1b' } }} />}
-                                    label={<Typography variant="body2">{size}</Typography>}
-                                    sx={{ mb: 0.5 }}
-                                />
-                            ))}
-                        </RadioGroup>
-                    </Box>
-                )}
-                {food.availableSizes && <Divider />}
 
-                {/* Add-ons */}
-                {food.availableAddons && food.availableAddons.length > 0 && (
+
+                {addons && addons.length > 0 && (
                     <Box sx={{ p: 3 }}>
                         <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>Add-ons</Typography>
-                        {food.availableAddons.map(addon => (
+                        {addons.map(addon => (
                             <Box key={addon.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
                                 <FormControlLabel
                                     control={
@@ -129,14 +105,14 @@ export default function ItemDetailsModal({ open, food, onClose }: Props) {
                                     }
                                     label={<Typography variant="body2">{addon.name}</Typography>}
                                 />
-                                <Typography variant="body2" fontWeight={600} color="text.secondary">+${addon.price.toFixed(2)}</Typography>
+                                <Typography variant="body2" fontWeight={600} color="text.secondary">+${Number(addon.price).toFixed(2)}</Typography>
                             </Box>
                         ))}
                     </Box>
                 )}
-                {food.availableAddons && <Divider />}
+                {addons.length > 0 && <Divider />}
 
-                {/* Special Instructions */}
+
                 <Box sx={{ p: 3 }}>
                     <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>Special Instructions</Typography>
                     <TextField
@@ -154,7 +130,7 @@ export default function ItemDetailsModal({ open, food, onClose }: Props) {
                 </Box>
             </DialogContent>
 
-            {/* Footer / Actions */}
+
             <DialogActions sx={{ p: 3, display: 'flex', justifyContent: 'space-between', bgcolor: '#fafafa' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', bgcolor: '#fff', border: '1px solid #e0e0e0', borderRadius: 2 }}>
                     <IconButton size="small" onClick={() => setQuantity(Math.max(1, quantity - 1))} sx={{ color: quantity > 1 ? '#000' : '#bdbdbd' }}>

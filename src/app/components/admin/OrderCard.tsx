@@ -46,7 +46,7 @@ export default function OrderCard({ order, onStatusChange }: OrderCardProps) {
     return (
         <Card sx={{ mb: 2, borderRadius: 2, boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
             <CardContent>
-                {/* Header: Order Number and Status Dropdown */}
+
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Box>
                         <Typography variant="h6" fontWeight="bold">

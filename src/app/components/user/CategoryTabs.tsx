@@ -6,23 +6,41 @@ import TapasIcon from '@mui/icons-material/Tapas';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import CakeIcon from '@mui/icons-material/Cake';
 import LocalCafeIcon from '@mui/icons-material/LocalCafe';
-import { Category } from '../../auth/user/types';
+import { useGetCategoriesQuery } from '@/lib/api';
+import { Category } from '@/lib/features/item/type';
 
-const categories: { label: Category; icon: React.ReactElement }[] = [
-    { label: 'All', icon: <AllInclusiveIcon fontSize="small" /> },
-    { label: 'Appetizers', icon: <TapasIcon fontSize="small" /> },
-    { label: 'Main Course', icon: <RestaurantMenuIcon fontSize="small" /> },
-    { label: 'Desserts', icon: <CakeIcon fontSize="small" /> },
-    { label: 'Beverages', icon: <LocalCafeIcon fontSize="small" /> },
-];
+
+
+const categoriesIcons = (category: Category) => {
+    switch (category.name.toLowerCase()) {
+        case 'appetizers':
+            return <TapasIcon fontSize="small" />;
+        case 'main course':
+            return <RestaurantMenuIcon fontSize="small" />;
+        case 'desserts':
+            return <CakeIcon fontSize="small" />;
+        case 'beverages':
+            return <LocalCafeIcon fontSize="small" />;
+        default:
+            return <AllInclusiveIcon fontSize="small" />;
+    }
+}
 
 interface Props {
-    selectedCategory: Category;
-    onSelectCategory: (category: Category) => void;
+    selectedCategory: string;
+    onSelectCategory: (category: string) => void;
 }
 
 export default function CategoryTabs({ selectedCategory, onSelectCategory }: Props) {
-    const handleTabChange = (_: React.SyntheticEvent, newValue: Category) => {
+
+    const { data: allCategories = [] } = useGetCategoriesQuery();
+
+    const categories = [
+        { label: 'All', icon: <AllInclusiveIcon fontSize="small" />, id: 'all' },
+        ...allCategories.map((cat) => ({ label: cat.name, icon: categoriesIcons(cat), id: cat.id })),
+    ];
+
+    const handleTabChange = (_: React.SyntheticEvent, newValue: string) => {
         onSelectCategory(newValue);
     };
 
@@ -54,7 +72,7 @@ export default function CategoryTabs({ selectedCategory, onSelectCategory }: Pro
                 {categories.map((cat) => (
                     <Tab
                         key={cat.label}
-                        value={cat.label}
+                        value={cat.id}
                         icon={cat.icon}
                         iconPosition="start"
                         label={cat.label}

@@ -1,8 +1,12 @@
 import { vi } from 'vitest'
 
 export const signinMock = vi.fn()
+export const getItemsMock = vi.fn()
+export const getCategoriesMock = vi.fn()
+export const getDietaryMock = vi.fn()
+export const getAddonsMock = vi.fn()
 
-export const mockSigninMutation = () => {
+export const mockApi = () => {
     vi.mock('@/lib/api', async () => {
         const actual = await vi.importActual<any>('@/lib/api')
         return {
@@ -11,6 +15,13 @@ export const mockSigninMutation = () => {
                 signinMock,
                 { isLoading: false, reset: vi.fn() },
             ],
+            useGetItemsQuery: getItemsMock,
+            useGetCategoriesQuery: getCategoriesMock,
+            useGetDietaryQuery: getDietaryMock,
+            useGetAddonsQuery: getAddonsMock,
         }
     })
 }
+
+// Keep it for backward compatibility
+export const mockSigninMutation = mockApi;

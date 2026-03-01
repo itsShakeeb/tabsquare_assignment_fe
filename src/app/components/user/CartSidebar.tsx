@@ -2,7 +2,6 @@
 import React from 'react';
 import { Box, Typography, Button, IconButton, Divider, Select, MenuItem, Chip } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import ConfirmationNumberOutlinedIcon from '@mui/icons-material/ConfirmationNumberOutlined';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -130,24 +129,7 @@ export default function CartSidebar() {
                     <Typography variant="subtitle2" fontWeight={700}>${deliveryFee.toFixed(2)}</Typography>
                 </Box>
 
-                {/* Promotions */}
-                <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
-                    <Button
-                        variant="outlined"
-                        fullWidth
-                        sx={{ color: '#000', borderColor: '#e0e0e0', bgcolor: '#f5f5f5', textTransform: 'none', fontWeight: 600, borderRadius: 2, py: 1.5, '&:hover': { bgcolor: '#ececec', borderColor: '#e0e0e0' } }}
-                    >
-                        Find Promotion
-                    </Button>
-                    <Button
-                        variant="contained"
-                        fullWidth
-                        startIcon={<ConfirmationNumberOutlinedIcon />}
-                        sx={{ bgcolor: '#f26a1b', color: '#fff', textTransform: 'none', fontWeight: 600, borderRadius: 2, py: 1.5, boxShadow: 'none', '&:hover': { bgcolor: '#d95d16', boxShadow: 'none' } }}
-                    >
-                        Add Coupon
-                    </Button>
-                </Box>
+
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3, alignItems: 'center' }}>
                     <Typography variant="body1" color="text.secondary" fontWeight={500}>Total</Typography>
