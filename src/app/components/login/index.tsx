@@ -84,6 +84,7 @@ const Login = () => {
                         label="Email Address"
                         variant="outlined"
                         fullWidth
+                        id="email"
                         type="email"
                         required
                         value={email}
@@ -101,7 +102,7 @@ const Login = () => {
                     />
 
                     <TextField
-                        label="Password"
+                        label="Password1"
                         variant="outlined"
                         fullWidth
                         type={showPassword ? 'text' : 'password'}
