@@ -1,15 +1,15 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { SigninRequest, SigninResponse } from './features/auth/type'
 
 export const api = createApi({
-    baseQuery: fetchBaseQuery({ baseUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/v1` }),
+    baseQuery: fetchBaseQuery({ baseUrl: `${process.env.NEXT_PUBLIC_API_URL}/v1` }),
     tagTypes: ['Auth'],
     endpoints: (build) => ({
-        signin: build.mutation({
-            query: (body) => ({ url: `/auth/signin`, method: 'POST', body }),
+        signin: build.mutation<SigninResponse, SigninRequest>({
+            query: (body) => ({ url: `/auth/login`, method: 'POST', body }),
             invalidatesTags: ['Auth'],
         }),
     }),
 })
 
-// Export hooks for usage in functional components
 export const { useSigninMutation } = api
