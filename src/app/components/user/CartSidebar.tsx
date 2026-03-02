@@ -1,17 +1,14 @@
 'use client';
 import React, { useState } from 'react';
-import { Box, Typography, Button, IconButton, Divider, Select, MenuItem, Chip, CircularProgress } from '@mui/material';
+import { Box, Typography, Button, IconButton, Divider, CircularProgress } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { useAppDispatch } from '../../../lib/hooks';
-import { removeFromCart } from '../../../lib/features/cart/cartSlice';
 import { useGetCartItemsQuery, useDeleteCartItemMutation, useCheckoutMutation } from '../../../lib/api';
 import { useRouter } from 'next/navigation';
 
 export default function CartSidebar() {
-    const dispatch = useAppDispatch();
     const router = useRouter();
     const [deleteCartItem] = useDeleteCartItemMutation();
     const [checkout] = useCheckoutMutation();
@@ -23,7 +20,6 @@ export default function CartSidebar() {
     const handleRemoveItem = async (id: string) => {
         try {
             await deleteCartItem(id).unwrap();
-            dispatch(removeFromCart(id));
         } catch (error) {
             console.error('Failed to remove item from cart:', error);
         }
@@ -42,6 +38,7 @@ export default function CartSidebar() {
                 router.push('/order-placed');
             }, 1000);
         } catch (error) {
+            console.error('Failed to checkout:', error);
             setIsCheckingOut(false);
         }
     }
@@ -81,7 +78,7 @@ export default function CartSidebar() {
                     </Box>
                 ) : (
                     cartItems.items.map((item) => (
-                        <Box key={item.id} sx={{ display: 'flex', gap: 2 }}>
+                        <Box key={item.item_id} sx={{ display: 'flex', gap: 2 }}>
                             <Box
                                 component="img"
                                 src={item.image}
@@ -90,16 +87,16 @@ export default function CartSidebar() {
                             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <Typography variant="subtitle2" fontWeight={700} sx={{ lineHeight: 1.2, pr: 1 }}>
-                                        {item.name}
+                                        {item.item_name}
                                     </Typography>
                                     <Typography variant="subtitle2" fontWeight={800} color="primary.main">
                                         ${Number(item.base_price).toFixed(2)}
                                     </Typography>
                                 </Box>
 
-                                {item.options?.instructions && (
+                                {item?.instruction && (
                                     <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', fontSize: '0.7rem' }}>
-                                        Wait: "{item.options.instructions}"
+                                        Instruction: {item.instruction}
                                     </Typography>
                                 )}
 

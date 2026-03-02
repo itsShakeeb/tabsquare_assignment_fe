@@ -1,8 +1,7 @@
-import { ItemResposne } from "@/lib/features/item/type";
 
 export type Category = 'All' | 'Appetizers' | 'Main Course' | 'Desserts' | 'Beverages';
 export type DietaryPreference = string;
-export type ItemSize = 'Regular' | 'Large' | 'Extra Large';
+export type ItemSize = 'regular' | 'large' | 'large';
 
 export interface FoodAddon {
     id: string;
@@ -10,31 +9,17 @@ export interface FoodAddon {
     price: number;
 }
 
-export interface FoodItem extends ItemResposne {
-    // id: string;
-    // name: string;
-    // description: string;
-    // price: number;
-    // image: string;
-    // category: Category;
-    // dietary_preferences: DietaryPreference[];
-    // preparation_time: number; // in minutes
-    // is_available: boolean;
-    // available_sizes?: ItemSize[];
-    // available_addons?: FoodAddon[];
-}
 
 export interface CartItemOption {
     size?: ItemSize;
-    addons: FoodAddon[];
-    instructions?: string;
+    addons: Pick<FoodAddon, 'id'>[];
+    instruction?: string;
 }
 
 export interface Item {
-
-    id: string;
     item_id: string;
     name: string;
+    size: ItemSize;
     base_price: number;
     total_price: number;
     quantity: number;
@@ -45,7 +30,24 @@ export interface Item {
 
 export interface CartItem {
     cart_id: string
-    items: Item[],
+    items: {
+        cart_item_id: string,
+        quantity: number,
+        size: ItemSize,
+        instruction: string,
+        item_id: string,
+        item_name: string,
+        base_price: number,
+        image: string,
+        add_ons: any[],
+        calculated_price: {
+            base: number,
+            size_adjusted: number,
+            add_ons_total: number,
+            unit_total: number,
+            quantity_total: number
+        }
+    }[],
     summary: {
         subtotal: number;
         delivery_fee: number;
@@ -63,7 +65,7 @@ export interface UserOrderItem {
     item_id: string;
     item_name: string;
     image: string;
-    add_ons: any[]; // replace with actual generic addon type if needed
+    add_ons: unknown[];
 }
 
 export interface UserOrder {

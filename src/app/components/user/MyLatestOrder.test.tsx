@@ -1,5 +1,5 @@
-import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
+import { describe, expect, test, beforeEach, } from 'vitest'
+import { screen } from '@testing-library/react'
 import { renderWithStore } from '@/tests/utils/renderWithStore'
 import { mockApi, getMyOrdersMock } from '@/tests/mocks/api'
 import MyLatestOrder from './MyLatestOrder'

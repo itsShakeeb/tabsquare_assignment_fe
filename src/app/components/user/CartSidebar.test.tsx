@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeEach, afterEach, vi } from 'vitest'
-import { screen, fireEvent, waitFor, act } from '@testing-library/react'
+import { screen, fireEvent, act } from '@testing-library/react'
 import { renderWithStore } from '@/tests/utils/renderWithStore'
 import { mockNextRouter, pushMock } from '@/tests/mocks/router'
 import { mockApi, getCartItemsMock, checkoutMock } from '@/tests/mocks/api'

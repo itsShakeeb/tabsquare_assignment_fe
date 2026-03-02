@@ -1,21 +1,23 @@
 export type OrderStatus = 'Received' | 'Preparing' | 'Ready' | 'Completed';
 export interface OrderItem {
     id: string;
-    name: string;
+    item_name: string;
     quantity: number;
-    price: number;
+    price_at_purchase: number | string;
+    instruction?: string;
 }
 
 export interface OrderDetail {
     id: string;
-    orderNumber: string;
-    customerName: string;
-    customerPhone?: string;
+    order_number: string;
+    customer_name: string;
+    customer_phone?: string;
     items: OrderItem[];
-    specialInstructions?: string;
-    orderTime: string;
+    created_at: string;
     status: OrderStatus;
-    totalAmount: number;
+    summary: {
+        total: number;
+    }
 }
 
 export interface OrderCardProps {

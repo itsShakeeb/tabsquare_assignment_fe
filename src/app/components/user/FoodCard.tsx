@@ -4,11 +4,11 @@ import { Card, CardContent, CardMedia, Typography, Box, IconButton, Chip } from 
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import { FoodItem } from '../../auth/user/types';
+import { ItemResposne } from '@/lib/features/item/type';
 
 interface Props {
-    item: FoodItem;
-    onClick: (item: FoodItem) => void;
+    item: ItemResposne;
+    onClick: (item: ItemResposne) => void;
 }
 
 export default function FoodCard({ item, onClick }: Props) {
@@ -39,25 +39,6 @@ export default function FoodCard({ item, onClick }: Props) {
                     sx={{ borderRadius: 4, objectFit: 'cover' }}
                 />
 
-                {/* Dietary Tags */}
-                {/* <Box sx={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: '80%' }}>
-                    {item.dietaryPreferences.map(pref => (
-                        <Chip
-                            key={pref}
-                            label={pref}
-                            size="small"
-                            sx={{
-                                bgcolor: 'rgba(255,255,255,0.9)',
-                                color: pref === 'Vegetarian' || pref === 'Vegan' ? '#2e7d32' : '#ed6c02',
-                                fontWeight: 600,
-                                fontSize: '0.65rem',
-                                height: 20,
-                            }}
-                        />
-                    ))}
-                </Box> */}
-
-                {/* Availability Overlay */}
                 {!item.is_available && (
                     <Box sx={{
                         position: 'absolute',

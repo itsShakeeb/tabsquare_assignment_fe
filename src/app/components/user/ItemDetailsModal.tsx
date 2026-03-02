@@ -2,29 +2,28 @@
 import React, { useState, useEffect } from 'react';
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
-    Button, Typography, Box, IconButton, Divider, FormControlLabel, Checkbox, TextField
+    Button, Typography, Box, IconButton, Divider, FormControlLabel, Checkbox, TextField,
+    FormControl, Select, MenuItem
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { FoodItem, CartItem, Item } from '../../auth/user/types';
-import { useAppDispatch } from '../../../lib/hooks';
-import { addToCart } from '../../../lib/features/cart/cartSlice';
+import { Item, ItemSize } from '../../auth/user/types';
 import { useAddToCartMutation, useGetAddonsQuery } from '../../../lib/api';
-import { Addon } from '../../../lib/features/item/type';
+import { Addon, ItemResposne } from '../../../lib/features/item/type';
 
 interface Props {
     open: boolean;
-    food: FoodItem | null;
+    food: ItemResposne | null;
     onClose: () => void;
 }
 
 export default function ItemDetailsModal({ open, food, onClose }: Props) {
-    const dispatch = useAppDispatch();
 
     const [selectedAddons, setSelectedAddons] = useState<Addon[]>([]);
+    const [selectedSize, setSelectedSize] = useState<ItemSize>('regular');
     const { data: addons = [] } = useGetAddonsQuery();
-    const [addToCart, { isLoading, isSuccess, isError }] = useAddToCartMutation();
+    const [addToCart, { isLoading }] = useAddToCartMutation();
     const [specialInstructions, setSpecialInstructions] = useState('');
     const [quantity, setQuantity] = useState(1);
 
@@ -51,17 +50,13 @@ export default function ItemDetailsModal({ open, food, onClose }: Props) {
     const itemTotal = basePrice * quantity;
 
     const handleAddToCart = async () => {
-        const cartItem: Item = {
-            id: `${food.id}`,
+        const cartItem: Pick<Item, 'item_id' | 'size' | 'quantity' | 'options'> = {
             item_id: food.id,
-            name: food.name,
-            base_price: basePrice,
-            total_price: itemTotal,
+            size: selectedSize,
             quantity: quantity,
-            image: food.image,
             options: {
-                addons: selectedAddons.map(a => ({ id: a.id, name: a.name, price: Number(a.price) })),
-                instructions: specialInstructions || undefined,
+                addons: selectedAddons.map(a => ({ id: a.id })),
+                instruction: specialInstructions || undefined,
             }
         };
         try {
@@ -93,7 +88,21 @@ export default function ItemDetailsModal({ open, food, onClose }: Props) {
                 </Box>
                 <Divider />
 
-
+                <Box sx={{ p: 3 }}>
+                    <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>Size</Typography>
+                    <FormControl fullWidth size="small">
+                        <Select
+                            value={selectedSize}
+                            onChange={(e) => setSelectedSize(e.target.value as ItemSize)}
+                            sx={{ borderRadius: 2 }}
+                        >
+                            <MenuItem value="regular">Regular</MenuItem>
+                            <MenuItem value="medium">Medium</MenuItem>
+                            <MenuItem value="large">Large</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
+                <Divider />
 
                 {addons && addons.length > 0 && (
                     <Box sx={{ p: 3 }}>

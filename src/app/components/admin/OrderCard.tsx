@@ -24,7 +24,6 @@ import { OrderCardProps, OrderStatus, statusColors } from '@/app/auth/admin/orde
 
 
 
-// Extracted reusable Status Chip element for the dropdown
 const StatusLabel = ({ status }: { status: OrderStatus }) => (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <Chip
@@ -50,11 +49,11 @@ export default function OrderCard({ order, onStatusChange }: OrderCardProps) {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Box>
                         <Typography variant="h6" fontWeight="bold">
-                            Order #{order.orderNumber}
+                            Order #{order.order_number}
                         </Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary', mt: 0.5 }}>
                             <AccessTimeIcon sx={{ fontSize: 16, mr: 0.5 }} />
-                            <Typography variant="body2">{order.orderTime}</Typography>
+                            <Typography variant="body2">{new Date(order.created_at).toLocaleString()}</Typography>
                         </Box>
                     </Box>
                     <Box sx={{ minWidth: 160, display: 'flex', justifyContent: 'flex-end' }}>
@@ -76,10 +75,10 @@ export default function OrderCard({ order, onStatusChange }: OrderCardProps) {
                                         }
                                     }}
                                 >
-                                    <MenuItem value="Received"><StatusLabel status="Received" /></MenuItem>
-                                    <MenuItem value="Preparing"><StatusLabel status="Preparing" /></MenuItem>
-                                    <MenuItem value="Ready"><StatusLabel status="Ready" /></MenuItem>
-                                    <MenuItem value="Completed"><StatusLabel status="Completed" /></MenuItem>
+                                    <MenuItem value="received"><StatusLabel status="Received" /></MenuItem>
+                                    <MenuItem value="preparing"><StatusLabel status="Preparing" /></MenuItem>
+                                    <MenuItem value="ready"><StatusLabel status="Ready" /></MenuItem>
+                                    <MenuItem value="completed"><StatusLabel status="Completed" /></MenuItem>
                                 </Select>
                             </FormControl>
                         ) : (
@@ -98,11 +97,11 @@ export default function OrderCard({ order, onStatusChange }: OrderCardProps) {
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <PersonOutlineIcon sx={{ mr: 1, color: 'text.secondary', fontSize: 20 }} />
                         <Typography variant="body2" fontWeight="medium">
-                            {order.customerName}
+                            {order.customer_name}
                         </Typography>
-                        {order.customerPhone && (
+                        {order.customer_phone && (
                             <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                                ({order.customerPhone})
+                                ({order.customer_phone})
                             </Typography>
                         )}
                     </Box>
@@ -117,45 +116,45 @@ export default function OrderCard({ order, onStatusChange }: OrderCardProps) {
                     </Typography>
                     <List disablePadding>
                         {order.items.map((item) => (
-                            <ListItem key={item.id} disableGutters sx={{ py: 0.5 }}>
-                                <ListItemText
-                                    disableTypography
-                                    primary={
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <Typography variant="body2">
-                                                <Box component="span" sx={{ fontWeight: 600, mr: 1 }}>{item.quantity}x</Box>
-                                                {item.name}
-                                            </Typography>
-                                            <Typography variant="body2" fontWeight="medium">
-                                                ${(item.price * item.quantity).toFixed(2)}
-                                            </Typography>
-                                        </Box>
-                                    }
-                                />
-                            </ListItem>
+                            <>
+                                <ListItem key={item.id} disableGutters sx={{ py: 0.5 }}>
+                                    <ListItemText
+                                        disableTypography
+                                        primary={
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <Typography variant="body2">
+                                                    <Box component="span" sx={{ fontWeight: 600, mr: 1 }}>{item.quantity}x</Box>
+                                                    {item.item_name}
+                                                </Typography>
+                                                <Typography variant="body2" fontWeight="medium">
+                                                    ${(Number(item.price_at_purchase) * Number(item.quantity)).toFixed(2)}
+                                                </Typography>
+                                            </Box>
+                                        }
+                                    />
+                                </ListItem>
+                                {item.instruction && (
+                                    <Box sx={{ mt: 2, p: 1.5, bgcolor: '#fff8e1', borderRadius: 1, border: '1px solid #ffe082' }}>
+                                        <Typography variant="caption" color="text.secondary" fontWeight="bold" display="block" sx={{ mb: 0.5 }}>
+                                            SPECIAL INSTRUCTIONS
+                                        </Typography>
+                                        <Typography variant="body2" color="text.primary">
+                                            {item.instruction}
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </>
                         ))}
                     </List>
                 </Box>
 
-                {/* Special Instructions */}
-                {order.specialInstructions && (
-                    <Box sx={{ mt: 2, p: 1.5, bgcolor: '#fff8e1', borderRadius: 1, border: '1px solid #ffe082' }}>
-                        <Typography variant="caption" color="text.secondary" fontWeight="bold" display="block" sx={{ mb: 0.5 }}>
-                            SPECIAL INSTRUCTIONS
-                        </Typography>
-                        <Typography variant="body2" color="text.primary">
-                            {order.specialInstructions}
-                        </Typography>
-                    </Box>
-                )}
 
-                {/* Total Amount */}
                 <Box sx={{ mt: 2, pt: 2, borderTop: '1px dashed #e0e0e0', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                     <Typography variant="subtitle2" color="text.secondary" sx={{ mr: 1, textTransform: 'uppercase' }}>
                         Total:
                     </Typography>
                     <Typography variant="h6" color="primary.main" fontWeight="bold">
-                        ${order.totalAmount.toFixed(2)}
+                        ${Number(order.summary.total).toFixed(2)}
                     </Typography>
                 </Box>
             </CardContent>

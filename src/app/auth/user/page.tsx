@@ -6,9 +6,9 @@ import CategoryTabs from '../../components/user/CategoryTabs';
 import FoodCard from '../../components/user/FoodCard';
 import MyLatestOrder from '../../components/user/MyLatestOrder';
 import ItemDetailsModal from '../../components/user/ItemDetailsModal';
-import { FoodItem } from './types';
 import { useGetItemsQuery } from '@/lib/api';
 import { useDebounce } from '@/hooks/useDebounce';
+import { ItemResposne } from '@/lib/features/item/type';
 
 
 export default function UserFoodOrderPage() {
@@ -17,10 +17,10 @@ export default function UserFoodOrderPage() {
     const [priceRange, setPriceRange] = useState<number[]>([0, 100]);
     const [dietaryPrefs, setDietaryPrefs] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
-    const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null);
+    const [selectedFood, setSelectedFood] = useState<ItemResposne | null>(null);
     const { data: items = [], isLoading } = useGetItemsQuery({ category: selectedCategory, dietary: dietaryPrefs, name: debouncedSearchQuery })
 
-    const handleFoodClick = (item: FoodItem) => {
+    const handleFoodClick = (item: ItemResposne) => {
         setSelectedFood(item);
     };
 

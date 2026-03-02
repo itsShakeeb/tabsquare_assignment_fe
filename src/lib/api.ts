@@ -3,13 +3,13 @@ import { SigninRequest, SigninResponse } from './features/auth/type'
 import { Category, ItemResposne, Dietary, Addon } from './features/item/type'
 import { buildQueryParams } from './utils'
 import { CartItem, Item, UserOrder } from '@/app/auth/user/types'
-import { OrderDetail } from '@/app/auth/admin/order/type'
+import { OrderDetail, OrderStatus } from '@/app/auth/admin/order/type'
 
 export const api = createApi({
     baseQuery: fetchBaseQuery({
         baseUrl: `${process.env.NEXT_PUBLIC_API_URL}/v1`,
         prepareHeaders: (headers, { getState }) => {
-            // @ts-ignore
+            // @ts-expect-error
             const token = getState().auth?.user?.access_token;
             if (token) {
                 headers.set('Authorization', `Bearer ${token}`);
@@ -42,7 +42,7 @@ export const api = createApi({
             query: () => ({ url: `/add_ons`, method: 'GET' }),
             providesTags: ['Addon'],
         }),
-        addToCart: build.mutation<void, Item>({
+        addToCart: build.mutation<void, Pick<Item, 'item_id' | 'size' | 'quantity' | 'options'>>({
             query: (body) => ({ url: `/cart/items`, method: 'POST', body }),
             invalidatesTags: ['Item'],
         }),
@@ -60,7 +60,19 @@ export const api = createApi({
         }),
         getMyOrders: build.query<UserOrder[], void>({
             query: () => ({ url: `/order/my-orders`, method: 'GET' }),
-            providesTags: ['Item'], // or creating a new tag 'Order'
+            providesTags: ['Item'],
+        }),
+        getAllOrdersFromAdmin: build.query<OrderDetail[], void>({
+            query: () => ({ url: `/order`, method: 'GET' }),
+            providesTags: ['Item'],
+        }),
+        updateOrderStatus: build.mutation<void, { orderId: string, status: OrderStatus }>({
+            query: ({ orderId, status }) => ({
+                url: `/order/${orderId}/status`,
+                method: 'PUT',
+                body: { status }
+            }),
+            invalidatesTags: ['Item'],
         }),
     }),
 })
@@ -75,5 +87,7 @@ export const {
     useGetCartItemsQuery,
     useDeleteCartItemMutation,
     useCheckoutMutation,
-    useGetMyOrdersQuery
+    useGetMyOrdersQuery,
+    useGetAllOrdersFromAdminQuery,
+    useUpdateOrderStatusMutation
 } = api
